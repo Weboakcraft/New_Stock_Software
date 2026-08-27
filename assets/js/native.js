@@ -218,6 +218,13 @@
     document.body.appendChild(bar);
   }
 
+  /* the welcome modal asks the person to connect a Google Sheet, which makes no
+     sense when the build already carries one */
+  if (App && App.welcome) {
+    var baseWelcome = App.welcome;
+    App.welcome = function () { if (!readSyncConfig()) return baseWelcome.apply(this, arguments); };
+  }
+
   /* ============================================================ theme colour */
   function pushTheme() {
     var dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -237,9 +244,12 @@
     App.boot = function () {
       var r = baseBoot.apply(this, arguments);
       Promise.resolve(r)['catch'](function () { })['then'](function () {
+        return applySyncConfig();
+      })['catch'](function () { })['then'](function () {
         bridge('appReady')();
         pushTheme();
         dropServiceWorkers();
+        if (LOCKED && App.el && App.route === 'sync') App.refresh();
       });
       return r;
     };
@@ -257,12 +267,82 @@
     });
   }
 
+  /* ============================================================ built-in sheet */
+  /* When the APK was built with the company's sheet baked in, the app connects
+     itself and the Sync & Backup screen stops asking for an address or a secret.
+     Nothing is stored in the repository or on the website - the values live only
+     inside this APK, injected from the build secrets. */
+  var LOCKED = false;
+
+  function readSyncConfig() {
+    var raw = safe(function () { return B.syncConfig(); }, '');
+    if (!raw) return null;
+    var cfg = safe(function () { return JSON.parse(raw); }, null);
+    if (!cfg || !cfg.url || !cfg.token) return null;
+    return cfg;
+  }
+
+  async function applySyncConfig() {
+    var cfg = readSyncConfig();
+    if (!cfg) return false;
+    LOCKED = !!cfg.locked;
+    var changed = false;
+    if (DB.getMeta('gasUrl', '') !== cfg.url) { await DB.setMeta('gasUrl', cfg.url); changed = true; }
+    if (DB.getMeta('gasToken', '') !== cfg.token) { await DB.setMeta('gasToken', cfg.token); changed = true; }
+    if (changed && w.Sync) Sync.run();
+    return true;
+  }
+
+  /* replace the "Google Sheet backend" card with a short locked notice */
+  function lockSyncCard(container) {
+    if (!LOCKED || !container) return;
+    var cards = container.querySelectorAll('.card');
+    for (var i = 0; i < cards.length; i++) {
+      if (!/Google Sheet backend/i.test(cards[i].textContent || '')) continue;
+      var card = cards[i];
+      card.innerHTML = '';
+
+      var status = el('div', { class: 'small muted mt8' });
+      function paint() {
+        var last = DB.getMeta('lastSyncAt', '');
+        var pend = w.Sync ? Sync.pendingCount() : 0;
+        status.innerHTML = 'Last sync ' + (last ? U.esc(U.ago(last)) : 'never') +
+          ' · <b>' + pend + '</b> record(s) waiting to upload' +
+          (w.Sync && Sync.lastError ? '<br><span class="red">' + U.esc(Sync.lastError) + '</span>' : '');
+      }
+      paint();
+      if (w.Sync) Sync.on(paint);
+
+      card.appendChild(UI.sect('Company sheet'));
+      card.appendChild(el('div', {
+        class: 'small',
+        html: 'This app is already connected to the company Google Sheet. There is nothing to set up here, and the address cannot be changed from the app.'
+      }));
+      card.appendChild(el('div', { class: 'flex gap10 wrap mt14' }, [
+        el('button', {
+          class: 'btn btn-p btn-sm', text: '⟳ Sync now',
+          onclick: function () { if (w.Sync) Sync.run({ loud: true }); }
+        }),
+        el('button', {
+          class: 'btn btn-ghost btn-sm', text: '⬇ Re-download everything',
+          onclick: async function () {
+            try { await Sync.pullAll(); UI.toast('Downloaded from the sheet', 'ok'); }
+            catch (e) { UI.toast(e.message, 'err'); }
+          }
+        })
+      ]));
+      card.appendChild(status);
+      break;
+    }
+  }
+
   /* ============================================================ Sync & Backup card */
   if (App && App.render) {
     var baseRender = App.render;
     App.render = function () {
       var r = baseRender.apply(this, arguments);
       if (App.route === 'sync') {
+        try { lockSyncCard(App.el.pageEl); } catch (e) { }
         try { appCard(App.el.pageEl); } catch (e) { }
       }
       return r;

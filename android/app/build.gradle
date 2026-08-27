@@ -15,6 +15,13 @@ def appVersionCode = Integer.parseInt((project.findProperty('oakVersionCode') ?:
 def updateBaseUrl  = (project.findProperty('oakUpdateUrl') ?: '').toString().replaceAll('/+$', '')
 def useMinify      = (project.findProperty('oakMinify') ?: 'false').toString().toBoolean()
 
+// ---- built-in Google Sheet connection (never committed; comes from CI secrets) ----
+// When both are set the app connects itself on first launch and the Sync & Backup
+// screen shows no address or secret for staff to see or change.
+def syncUrl   = (project.findProperty('oakSyncUrl')   ?: System.getenv('OAK_SYNC_URL')   ?: '').toString().trim()
+def syncToken = (project.findProperty('oakSyncToken') ?: System.getenv('OAK_SYNC_TOKEN') ?: '').toString().trim()
+static String javaStr(String v) { '"' + v.replace('\\', '\\\\').replace('"', '\\"') + '"' }
+
 // ---------------------------------------------------------------- signing
 def ksPath      = (project.findProperty('oakKeystore') ?: System.getenv('OAK_KEYSTORE') ?: '').toString().trim()
 def hasKeystore = !ksPath.isEmpty() && file(ksPath).exists()
@@ -82,6 +89,8 @@ android {
         versionCode appVersionCode
         versionName appVersionName
         buildConfigField 'String', 'UPDATE_BASE_URL', "\"${updateBaseUrl}\""
+        buildConfigField 'String', 'SYNC_URL',   javaStr(syncUrl)
+        buildConfigField 'String', 'SYNC_TOKEN', javaStr(syncToken)
         vectorDrawables.useSupportLibrary = true
     }
 

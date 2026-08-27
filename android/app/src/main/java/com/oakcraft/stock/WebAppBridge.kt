@@ -35,6 +35,8 @@ class WebAppBridge(private val host: Host, private val versionName: String) {
         fun updateInfoJson(): String
         fun setUpdateUrl(url: String)
         fun resetWebFiles()
+        /** The Google Sheet connection built into this build, or "{}" when there is none. */
+        fun syncConfigJson(): String
         fun exitApp()
         fun vibrate(ms: Long)
     }
@@ -79,6 +81,14 @@ class WebAppBridge(private val host: Host, private val versionName: String) {
     @JavascriptInterface fun updateInfo(): String = host.updateInfoJson()
     @JavascriptInterface fun setUpdateUrl(url: String) = host.setUpdateUrl(url)
     @JavascriptInterface fun resetWebFiles() = host.resetWebFiles()
+
+    // ------------------------------------------------------------ built-in sheet
+    /**
+     * The company's Google Sheet address and secret, baked in at build time from
+     * CI secrets. Returns "{}" when this build has none, in which case the app
+     * behaves exactly as before and the person sets it up by hand.
+     */
+    @JavascriptInterface fun syncConfig(): String = host.syncConfigJson()
 
     // ---------------------------------------------------------------- file channel
     @JavascriptInterface

@@ -676,6 +676,22 @@ class MainActivity : AppCompatActivity(), WebAppBridge.Host {
         toast(getString(R.string.update_url_saved), false)
     }
 
+    override fun syncConfigJson(): String = try {
+        val url = BuildConfig.SYNC_URL
+        val token = BuildConfig.SYNC_TOKEN
+        if (url.isBlank() || token.isBlank()) {
+            "{}"
+        } else {
+            JSONObject().apply {
+                put("url", url)
+                put("token", token)
+                put("locked", true)
+            }.toString()
+        }
+    } catch (e: Exception) {
+        "{}"
+    }
+
     override fun resetWebFiles() {
         val ok = store.resetToBundled()
         runOnUiThread {
