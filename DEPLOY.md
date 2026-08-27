@@ -75,7 +75,7 @@ Until you do this, each device keeps its own data. After this, your phone, your 
 4. Near the top of the script change
 
    ```js
-   var TOKEN = 'oakcraft2026';
+   var TOKEN = 'SET-YOUR-OWN-SECRET-HERE';
    ```
 
    to a secret word of your own. Save again.
