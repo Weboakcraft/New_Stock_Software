@@ -35,7 +35,7 @@
  */
 
 /** Secret word. Must match the one entered in the app. CHANGE THIS. */
-var TOKEN = 'oakcraft2026';
+var TOKEN = 'SET-YOUR-OWN-SECRET-HERE';
 
 /** Optional: paste a spreadsheet ID to target a specific file.
  *  Leave '' when the script is bound to the sheet (the normal case). */
