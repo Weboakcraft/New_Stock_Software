@@ -5,7 +5,11 @@ android/app/build/
 android/local.properties
 android/keystore/ci.jks
 _site/
+dist/
 node_modules/
 .DS_Store
 Thumbs.db
 *.log
+
+# generated at deploy time by tools/make-version.js
+version.json

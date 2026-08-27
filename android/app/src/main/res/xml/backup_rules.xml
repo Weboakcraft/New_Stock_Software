@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- The web app's own data (IndexedDB) lives in the WebView data directory.
+         The downloaded web-update overlay is deliberately excluded: it is a cache
+         that rebuilds itself, and restoring it onto a different app version would
+         serve mismatched files. -->
+    <exclude domain="file" path="weblive" />
+    <exclude domain="file" path="weblive-tmp" />
+    <exclude domain="file" path="weblive-new" />
+</full-backup-content>

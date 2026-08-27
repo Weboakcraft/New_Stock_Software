@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Oakcraft Stock</string>
+    <string name="scanner_title">Point the camera at a barcode</string>
+    <string name="scanner_hint">Hold the phone steady about 15 cm away</string>
+    <string name="scanner_close">Close</string>
+    <string name="scanner_torch">Torch</string>
+    <string name="scanner_no_permission">Camera permission is needed to scan barcodes.</string>
+    <string name="lock_title">Oakcraft Stock is locked</string>
+    <string name="lock_subtitle">Unlock to see your stock and billing data</string>
+    <string name="lock_unlock">Unlock</string>
+    <string name="lock_prompt_title">Unlock Oakcraft Stock</string>
+    <string name="lock_prompt_subtitle">Use your fingerprint, face or screen lock</string>
+    <string name="lock_prompt_confirm">Turn on app lock</string>
+    <string name="exit_confirm">Press back again to close Oakcraft Stock</string>
+    <string name="update_ready">Update installed — reopening with the newest version</string>
+    <string name="saved_to_downloads">Saved to Downloads: %1$s</string>
+    <string name="save_failed">Could not save the file</string>
+    <string name="share_bill">Share bill</string>
+    <string name="pdf_failed">Could not make the PDF</string>
+    <string name="no_app_for_link">No app on this phone can open that link</string>
+    <string name="choose_file">Choose a file</string>
+    <string name="print_failed">Printing is not available on this phone</string>
+    <string name="scanner_no_camera">The camera could not be opened</string>
+    <string name="lock_use_screen_lock">Use screen lock</string>
+    <string name="lock_off_subtitle">Confirm it is you before switching app lock off</string>
+    <string name="lock_needs_screen_lock">Set a screen lock, PIN or fingerprint on this phone first</string>
+    <string name="lock_on">App lock is on — Oakcraft Stock will ask before opening</string>
+    <string name="update_off">Auto-update is switched off</string>
+    <string name="update_offline">No internet — the app will look again later</string>
+    <string name="update_checking">Checking for a newer version…</string>
+    <string name="update_url_saved">Update address saved</string>
+    <string name="update_reset_ok">Went back to the version built into this app</string>
+    <string name="update_reset_fail">Could not clear the downloaded files</string>
+</resources>
