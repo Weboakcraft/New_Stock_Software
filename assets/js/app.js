@@ -207,7 +207,7 @@
       DB.on('change', () => { App.paintSync(); });
       w.Sync && Sync.start();
       /* service worker */
-      if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+      if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0 && !w.OAK_NATIVE) {
         navigator.serviceWorker.register('./sw.js').catch(() => { });
       }
       /* first run helper */
