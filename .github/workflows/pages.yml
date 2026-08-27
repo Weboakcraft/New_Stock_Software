@@ -1,0 +1,52 @@
+name: Deploy website to GitHub Pages
+
+on:
+  push:
+    branches: [ main, master ]
+    paths-ignore:
+      - 'android/**'
+      - '**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stamp the build version into the service worker
+        run: |
+          STAMP="$(date -u +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}"
+          sed -i "s/oakcraft-stock-v1\.0\.0/oakcraft-stock-$STAMP/" sw.js
+          echo "Cache version: oakcraft-stock-$STAMP"
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Package the site
+        run: |
+          mkdir -p _site
+          rsync -a --exclude '.git' --exclude '.github' --exclude 'android' \
+                --exclude '_site' --exclude 'docs' ./ _site/
+          touch _site/.nojekyll
+          ls -la _site
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

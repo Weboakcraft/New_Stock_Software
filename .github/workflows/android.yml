@@ -1,0 +1,98 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      app_url:
+        description: 'Web address the APK should open (leave blank to use this repo GitHub Pages URL)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Work out the app URL
+        id: url
+        run: |
+          IN="${{ github.event.inputs.app_url }}"
+          if [ -z "$IN" ]; then
+            OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            REPO=$(echo "${{ github.event.repository.name }}")
+            IN="https://${OWNER}.github.io/${REPO}/"
+          fi
+          echo "app_url=$IN" >> "$GITHUB_OUTPUT"
+          echo "APK will open: $IN"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Make sure the Android platform this app needs is installed
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          ls "$ANDROID_HOME/platforms" || true
+          yes 2>/dev/null | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" "build-tools;34.0.0" >/dev/null 2>&1 || true
+          ls "$ANDROID_HOME/platforms"
+
+      - name: Use a signing key from repository secrets when one is provided
+        if: env.KEYSTORE_BASE64 != ''
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/keystore/ci.jks
+          {
+            echo "OAKCRAFT_STORE_FILE=../keystore/ci.jks"
+            echo "OAKCRAFT_STORE_PASSWORD=$KEYSTORE_PASSWORD"
+            echo "OAKCRAFT_KEY_ALIAS=$KEY_ALIAS"
+            echo "OAKCRAFT_KEY_PASSWORD=$KEY_PASSWORD"
+          } >> android/gradle.properties
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build the release APK
+        working-directory: android
+        run: gradle --no-daemon assembleRelease -PappUrl="${{ steps.url.outputs.app_url }}"
+
+      - name: Rename it
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/release/app-release.apk "out/oakcraft-stock.apk"
+          ls -la out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oakcraft-stock-apk
+          path: out/oakcraft-stock.apk
+          if-no-files-found: error
+
+      - name: Publish it as the "latest-apk" release
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest-apk
+          name: Oakcraft Stock — latest APK
+          body: |
+            Install this on any Android phone (Android 6.0 / API 23 and newer).
+
+            * The app opens **${{ steps.url.outputs.app_url }}**
+            * First launch needs internet; after that it works offline
+            * Every push to this repository updates the app automatically — no reinstall needed
+
+            Built from commit `${{ github.sha }}`.
+          files: out/oakcraft-stock.apk
+          make_latest: true
