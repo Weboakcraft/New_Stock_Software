@@ -1,5 +1,5 @@
 /* Oakcraft Stock — service worker (offline shell + auto update) */
-const VERSION = 'oakcraft-stock-v1.0.0';
+const VERSION = 'oakcraft-stock-v1.1.0';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './offline.html',
   './assets/css/app.css',
@@ -10,6 +10,7 @@ const SHELL = [
   './assets/js/pages/dashboard.js', './assets/js/pages/party.js', './assets/js/pages/stock.js',
   './assets/js/pages/docs.js', './assets/js/pages/misc.js', './assets/js/pages/barcode.js',
   './assets/js/pages/reports.js', './assets/js/pages/settings.js',
+  './assets/js/native.js',
   './gas/Code.gs'
 ];
 
