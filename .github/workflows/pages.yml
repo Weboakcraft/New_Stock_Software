@@ -2,10 +2,7 @@ name: Deploy website to GitHub Pages
 
 on:
   push:
-    branches: [ main, master ]
-    paths-ignore:
-      - 'android/**'
-      - '**/*.md'
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -18,35 +15,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
+    name: Assemble the site
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Stamp the build version into the service worker
-        run: |
-          STAMP="$(date -u +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}"
-          sed -i "s/oakcraft-stock-v1\.0\.0/oakcraft-stock-$STAMP/" sw.js
-          echo "Cache version: oakcraft-stock-$STAMP"
-
-      - uses: actions/configure-pages@v5
+      - uses: actions/setup-node@v4
         with:
-          enablement: true
+          node-version: '20'
 
-      - name: Package the site
+      # version.json is what the Android app reads to find out whether the
+      # website has newer screens than the ones it is running.
+      - name: Stamp version.json
+        run: node tools/make-version.js
+
+      - name: Copy the site together
         run: |
           mkdir -p _site
-          rsync -a --exclude '.git' --exclude '.github' --exclude 'android' \
-                --exclude '_site' --exclude 'docs' ./ _site/
+          cp -r index.html offline.html manifest.webmanifest sw.js version.json assets gas _site/
           touch _site/.nojekyll
-          ls -la _site
+          echo "Published $(find _site -type f | wc -l) files"
+
+      - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
 
+  deploy:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@v4
