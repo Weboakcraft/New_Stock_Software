@@ -96,6 +96,11 @@ jobs:
           OAK_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           OAK_KEY_ALIAS: ${{ secrets.KEY_ALIAS || 'oakcraft' }}
           OAK_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          # Optional: bake the company Google Sheet into the APK so staff phones
+          # connect themselves. Passed as environment variables, never on the
+          # command line, so they cannot show up in a process list or a log.
+          OAK_SYNC_URL: ${{ secrets.SYNC_URL }}
+          OAK_SYNC_TOKEN: ${{ secrets.SYNC_TOKEN }}
         run: |
           chmod +x gradlew
           if [ "${{ steps.signing.outputs.signed }}" = "true" ]; then TASK=assembleRelease; else TASK=assembleDebug; fi
@@ -146,6 +151,11 @@ jobs:
             echo "| Version | ${{ steps.cfg.outputs.version_name }} (code ${{ github.run_number }}) |"
             echo "| Update address | ${{ steps.cfg.outputs.update_url }} |"
             echo "| Signed with your key | ${{ steps.signing.outputs.signed }} |"
+            if [ -n "${{ secrets.SYNC_URL }}" ] && [ -n "${{ secrets.SYNC_TOKEN }}" ]; then
+              echo "| Google Sheet | built in - phones connect themselves |"
+            else
+              echo "| Google Sheet | not built in - each phone is set up by hand |"
+            fi
             echo
             if [ "${{ steps.signing.outputs.signed }}" != "true" ]; then
               echo "> **This is a test build.** It installs, but a later build will be signed"
