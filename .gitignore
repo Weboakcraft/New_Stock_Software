@@ -1,0 +1,11 @@
+# build output
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/keystore/ci.jks
+_site/
+node_modules/
+.DS_Store
+Thumbs.db
+*.log

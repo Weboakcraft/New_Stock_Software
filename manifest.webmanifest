@@ -1,0 +1,23 @@
+{
+  "name": "Oakcraft Stock — Inventory & Billing",
+  "short_name": "Oakcraft Stock",
+  "description": "Stock flow, billing, GST invoices, barcode labels and reports for Oakcraft.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7f4ee",
+  "theme_color": "#241a13",
+  "lang": "en-IN",
+  "categories": ["business", "productivity", "finance"],
+  "icons": [
+    { "src": "./assets/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/img/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "New sale bill", "short_name": "Sale", "url": "./index.html#/doc/new?type=SALE" },
+    { "name": "Stock", "short_name": "Stock", "url": "./index.html#/stock" },
+    { "name": "Party", "short_name": "Party", "url": "./index.html#/party" }
+  ]
+}

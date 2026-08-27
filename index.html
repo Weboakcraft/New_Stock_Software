@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5">
+<title>Oakcraft Stock — Inventory &amp; Billing</title>
+<meta name="description" content="Oakcraft Stock — inventory, stock flow, billing, GST invoices, barcode labels and reports. Works offline, syncs to your own Google Sheet.">
+<meta name="theme-color" content="#241a13">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Oakcraft Stock">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./assets/img/logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./assets/img/icon-192.png">
+<link rel="stylesheet" href="./assets/css/app.css">
+</head>
+<body>
+<div id="app">
+  <div style="margin:auto;text-align:center;padding:60px 20px">
+    <img src="./assets/img/logo.svg" width="64" height="64" alt="">
+    <p style="font:600 15px system-ui;color:#8a7a68;margin-top:14px">Loading Oakcraft Stock…</p>
+  </div>
+</div>
+<div id="toasts"></div>
+<div id="printarea"></div>
+
+<script src="./assets/js/util.js"></script>
+<script src="./assets/js/i18n.js"></script>
+<script src="./assets/js/db.js"></script>
+<script src="./assets/js/api.js"></script>
+<script src="./assets/js/sync.js"></script>
+<script src="./assets/js/model.js"></script>
+<script src="./assets/js/seed.js"></script>
+<script src="./assets/js/ui.js"></script>
+<script src="./assets/js/charts.js"></script>
+<script src="./assets/js/barcode.js"></script>
+<script src="./assets/js/qrcode.js"></script>
+<script src="./assets/js/app.js"></script>
+<script src="./assets/js/print.js"></script>
+<script src="./assets/js/pages/dashboard.js"></script>
+<script src="./assets/js/pages/party.js"></script>
+<script src="./assets/js/pages/stock.js"></script>
+<script src="./assets/js/pages/docs.js"></script>
+<script src="./assets/js/pages/misc.js"></script>
+<script src="./assets/js/pages/barcode.js"></script>
+<script src="./assets/js/pages/reports.js"></script>
+<script src="./assets/js/pages/settings.js"></script>
+</body>
+</html>
